@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model embeddings {
+  subject String  @id
+  module  Int     @db.SmallInt
+  vector  Float?
+  content String?
+}
+
+model notes {
+  id           Int       @id @default(autoincrement())
+  user_id      String?   @db.Uuid
+  subject_code String?   @db.VarChar(16)
+  note         String?
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  profiles     profiles? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model profiles {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String?   @db.VarChar(80)
+  email      String?   @unique @db.VarChar(120)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  password   String    @db.VarChar(255)
+  notes      notes[]
+}
+
+model syllabus {
+  id           Int     @id @default(autoincrement())
+  subject_code String? @db.VarChar(16)
+  subject      String? @db.VarChar(128)
+  semester     Int?
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  branch    String?
+  year      Int?
+  createdAt DateTime @default(now())
+}
