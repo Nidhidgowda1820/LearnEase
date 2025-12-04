@@ -7,7 +7,7 @@ LearnEase-frontend/
 LearnEase-master/
 # Ignore raw data files
 learnease_ai/data/raw/
-
+*.pdf
 # Ignore system files
 *.log
 *.tmp
