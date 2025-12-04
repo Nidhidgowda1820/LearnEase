@@ -6,7 +6,10 @@ venv/
 LearnEase-frontend/
 LearnEase-master/
 # Ignore raw data files
-learnease_ai/data/raw/
+data/raw/
+data/faiss_index/ids.npy
+data/faiss_index/index.faiss
+
 *.pdf
 # Ignore system files
 *.log
