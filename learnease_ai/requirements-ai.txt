@@ -1,0 +1,11 @@
+sentence-transformers
+transformers
+torch          # will pick CPU; if you have GPU install appropriate wheel
+faiss-cpu
+numpy
+python-dotenv
+fastapi
+uvicorn[standard]
+openai
+google-generativeai
+pillow
