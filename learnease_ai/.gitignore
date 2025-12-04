@@ -5,8 +5,15 @@ venv/
 # Ignore other worktrees/repos
 LearnEase-frontend/
 LearnEase-master/
+# Ignore raw data files
+learnease_ai/data/raw/
 
 # Ignore system files
 *.log
 *.tmp
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
 
