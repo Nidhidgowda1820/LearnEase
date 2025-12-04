@@ -1,0 +1,12 @@
+# Ignore virtual environments
+venv/
+.env
+
+# Ignore other worktrees/repos
+LearnEase-frontend/
+LearnEase-master/
+
+# Ignore system files
+*.log
+*.tmp
+
