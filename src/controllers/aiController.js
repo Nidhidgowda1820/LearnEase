@@ -1,28 +1,28 @@
-import axios from "axios";
-import dotenv from "dotenv";
-dotenv.config();
+import { genAI } from "../config/gemini.js";
 
-const AI_ENDPOINT = process.env.AI_ENDPOINT; // Provided by AI member
-const AI_API_KEY = process.env.AI_API_KEY;   // Provided by AI member
-
-export const generateAnswer = async (req, res) => {
+export const generateSummary = async (req, res) => {
   try {
-    const { question, subject } = req.body;
+    const { subject_code, topic, content } = req.body;
+    if (!topic) return res.status(400).json({ error: "topic is required" });
 
-    if (!question || !subject) {
-      return res.status(400).json({ error: "Question and subject are required" });
-    }
+    // Use stable 2025 model name
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    // Call AI API (from AI member)
-    const response = await axios.post(
-      AI_ENDPOINT,
-      { question, subject },
-      { headers: { "Authorization": `Bearer ${AI_API_KEY}` } }
-    );
+    const prompt = `
+You are a VTU exam tutor.
+Subject: ${subject_code || "N/A"}
+Topic: ${topic}
 
-    res.json({ answer: response.data.answer });
+Generate a concise 10-marks exam summary:
+${content || "Please use your knowledge"}.
+`;
+
+    const result = await model.generateContent(prompt);
+    const text = await result.response.text();
+
+    res.json({ topic, subject_code, summary: text });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ error: "Failed to get AI answer" });
+    console.error("generateSummary error:", error);
+    res.status(500).json({ error: error.message });
   }
 };

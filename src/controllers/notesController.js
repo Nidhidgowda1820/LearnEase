@@ -1,87 +1,74 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import prisma from "../config/db.js";
 
-// ===============================
 // CREATE NOTE
-// ===============================
 export const createNote = async (req, res) => {
   try {
-    const { subject_code, note } = req.body;
+    const { content, subject_code, user_id } = req.body;
 
-    const newNote = await prisma.notes.create({
+    const noteRow = await prisma.notes.create({
       data: {
-        user_id: req.user.id,
-        subject_code,
-        note,
+        note: content,        // maps to `note` column
+        subject_code,         // optional
+        user_id               // optional
       },
     });
 
-    res.json({ message: "Note created", note: newNote });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// ===============================
-// GET ALL NOTES OF USER
-// ===============================
-export const getNotes = async (req, res) => {
-  try {
-    const notes = await prisma.notes.findMany({
-      where: { user_id: req.user.id },
-    });
-
-    res.json({ notes });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-export const updateNote = async (req, res) => {
-  try {
-    const id = Number(req.params.id);  // FIX: Convert to Number
-
-    const note = await prisma.notes.findUnique({
-      where: { id }
-    });
-
-    if (!note) {
-      return res.status(404).json({ message: "Note not found" });
-    }
-
-    const updated = await prisma.notes.update({
-      where: { id },
-      data: {
-        subject_code: req.body.subject_code,
-        note: req.body.note
-      }
-    });
-
-    res.json({ message: "Note updated", updated });
+    res.status(201).json(noteRow);
   } catch (error) {
+    console.error("createNote error:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-
-export const deleteNote = async (req, res) => {
+export const getNoteById = async (req, res) => {
   try {
-    const id = Number(req.params.id);  // FIX: Convert to Number
+    const { id } = req.params;
 
     const note = await prisma.notes.findUnique({
-      where: { id }
+      where: { id: Number(id) },
     });
 
     if (!note) {
-      return res.status(404).json({ message: "Note not found" });
+      return res.status(404).json({ error: "Note not found" });
     }
 
-    await prisma.notes.delete({
-      where: { id }
+    res.json(note);
+  } catch (error) {
+    console.error("getNoteById error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// UPDATE NOTE     -> PUT /api/notes/:id
+export const updateNote = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { content } = req.body;
+
+    const note = await prisma.notes.update({
+      where: { id: Number(id) },
+      data: { note: content },
     });
 
-    res.json({ message: "Note deleted successfully" });
+    res.json(note);
   } catch (error) {
+    console.error("updateNote error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// DELETE NOTE     -> DELETE /api/notes/:id
+export const deleteNote = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await prisma.notes.delete({
+      where: { id: Number(id) },
+    });
+
+    res.json({ message: "Note deleted" });
+  } catch (error) {
+    console.error("deleteNote error:", error);
     res.status(500).json({ error: error.message });
   }
 };

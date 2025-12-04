@@ -1,9 +1,9 @@
 import express from "express";
-import { getSubjects, createSubject } from "../controllers/subjectController.js";
-
 const router = express.Router();
 
-router.get("/", getSubjects);
-router.post("/", createSubject);
+// Test route
+router.get("/", (req, res) => {
+  res.json({ message: "Subject routes working!" });
+});
 
 export default router;

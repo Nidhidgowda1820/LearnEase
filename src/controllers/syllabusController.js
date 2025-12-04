@@ -1,23 +1,19 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../config/db.js";
 
-const prisma = new PrismaClient();
-
-export const getSyllabus = async (req, res) => {
+export const getSubjects = async (req, res) => {
   try {
-    const { semester } = req.query;
-
-    let syllabus;
-
-    if (semester) {
-      syllabus = await prisma.syllabus.findMany({
-        where: { semester: Number(semester) }
-      });
-    } else {
-      syllabus = await prisma.syllabus.findMany();
-    }
-
-    res.json({ syllabus });
+    const subjects = await prisma.syllabus.findMany({
+      select: { 
+        id: true,
+        subject_code: true, 
+        subject: true, 
+        semester: true 
+      },
+      orderBy: { semester: 'asc' }
+    });
+    res.json(subjects);
   } catch (error) {
+    console.error("getSubjects error:", error);
     res.status(500).json({ error: error.message });
   }
 };
